@@ -1,0 +1,13 @@
+FROM python:3.12-alpine
+RUN apk add --no-cache ca-certificates build-base libffi-dev openssl-dev git
+RUN addgroup -g 977 -S searxng && adduser -S -D -H -u 977 -h /usr/local/searxng -s /bin/sh -G searxng -g searxng searxng
+WORKDIR /usr/local/searxng
+RUN python -m venv .venv
+COPY requirements*.txt ./
+RUN . .venv/bin/activate && pip install --no-cache-dir -r requirements.txt -r requirements-server.txt
+COPY . .
+RUN mkdir -p /etc/searxng /var/cache/searxng && chown -R searxng:searxng /etc/searxng /var/cache/searxng /usr/local/searxng
+ENV PATH=/usr/local/searxng/.venv/bin:$PATH CONFIG_PATH=/etc/searxng DATA_PATH=/var/cache/searxng SEARXNG_SETTINGS_PATH=/etc/searxng/settings.yml
+EXPOSE 8080
+USER searxng
+CMD ["python", "-c", "from searx.webapp import app; app.run(host=\"0.0.0.0\", port=8080)"]

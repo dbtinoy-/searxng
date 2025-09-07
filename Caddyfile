@@ -1,0 +1,13 @@
+# Caddyfile for SearXNG
+# Reverse proxy configuration
+
+localhost {
+    reverse_proxy searxng:8080
+}
+
+# Optional: Add SSL/TLS for production
+# searxng.example.com {
+#     reverse_proxy searxng:8080
+#     tls your-email@example.com
+# }
+
